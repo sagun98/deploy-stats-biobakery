@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 import csv
 import requests
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title="bioBakery Stats API",
@@ -13,6 +14,15 @@ app = FastAPI(
         "email": "your-email@example.com",
     },
 )
+# Allow CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Replace with specific origins like ["http://localhost:3000"] for security
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
+)
+
 
 JSON_FILE = "docker_stats.json"
 CSV_FILE = "docker_stats.csv"
@@ -104,7 +114,7 @@ def save_stats_to_file(stats, file_type="json"):
 
 def fetch_all_docker_stats():
     """
-    Fetch Docker stats for all repositories in the Biobakery organization.
+    Fetch Docker stats for all repositories in the Biobakery organization and sort by pull count in descending order.
     """
     repositories = fetch_biobakery_repositories()
     stats = {}
@@ -115,7 +125,14 @@ def fetch_all_docker_stats():
             stats[f"biobakery/{repository}"] = {"pull_count": pull_count}
         else:
             stats[f"biobakery/{repository}"] = {"error": "Failed to fetch data"}
-    return stats
+    
+    # Sort stats by pull count in descending order
+    sorted_stats = dict(
+        sorted(stats.items(), key=lambda item: item[1].get("pull_count", 0), reverse=True)
+    )
+    
+    return sorted_stats
+
 
 
 def fetch_biobakery_repositories():
