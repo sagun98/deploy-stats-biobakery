@@ -11,7 +11,7 @@ app = FastAPI(
     version="1.0.0",
     contact={
         "name": "bioBakery Download Stats",
-        "email": "your-email@example.com",
+        "email": "sagunmaharjann@gmail.com",
     },
 )
 # Allow CORS
