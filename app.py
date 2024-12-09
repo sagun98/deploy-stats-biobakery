@@ -1,86 +1,71 @@
-from fastapi import FastAPI, HTTPException, Query
+import os
+import re
+import time
 import json
-from datetime import datetime
 import csv
-import requests
+from datetime import datetime
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from pytz import timezone
+import requests
+from bs4 import BeautifulSoup
+from collections import Counter
+import zopy.utils as zu
 
 app = FastAPI(
     title="bioBakery Stats API",
-    description="An API to fetch Docker Hub repository stats for the Biobakery organization.",
+    description="An API to fetch repository stats for the Biobakery organization from Docker Hub, Conda, PyPI, and Bioconductor.",
     version="1.0.0",
     contact={
         "name": "bioBakery Download Stats",
         "email": "sagunmaharjann@gmail.com",
     },
 )
+
 # Allow CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Replace with specific origins like ["http://localhost:3000"] for security
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all HTTP methods
-    allow_headers=["*"],  # Allow all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
+JSON_FILE = "repository_stats.json"
+CSV_FILE = "repository_stats.csv"
 
-JSON_FILE = "docker_stats.json"
-CSV_FILE = "docker_stats.csv"
-
-
-# Function definitions as in the previous implementation...
-
-
-@app.get(
-    "/",
-    summary="Welcome Message",
-    description="Returns a welcome message for the Docker Stats API.",
-    tags=["General"],
-)
+@app.get("/")
 def read_root():
-    return {"message": "Welcome to the Docker Stats API!"}
+    return {"message": "Welcome to the Repository Stats API!"}
 
-
-@app.get(
-    "/fetch-stats-from-file",
-    summary="Fetch Stats from File",
-    description="Fetches Docker Hub repository stats from a local JSON/CSV file, including the last update date/time.",
-    tags=["Stats"],
-)
-def fetch_stats_from_file(file_type: str = Query("json", enum=["json", "csv"], description="The file format to read stats from (json or csv).")):
-    """
-    Fetch stats from the local file.
-
-    - **file_type**: Specify whether to fetch data from a JSON or CSV file.
-    """
+@app.get("/fetch-stats-from-file")
+def fetch_stats_from_file(file_type: str = Query("json", enum=["json", "csv"])):
     stats = load_stats_from_file(file_type)
     if "error" in stats:
         raise HTTPException(status_code=404, detail=stats["error"])
     return stats
 
+@app.get("/update-stats-from-api")
+def update_stats_from_api(file_type: str = Query("json", enum=["json", "csv"])):
+    docker_stats = fetch_all_docker_stats()
+    conda_stats = fetch_conda_stats_via_curl()
+    bioconductor_packages = ["MMUPHin", "Maaslin2", "Macarron", "banocc", "sparseDOSSA"]
+    bioconductor_stats = fetch_bioconductor_stats(bioconductor_packages)
 
-@app.get(
-    "/update-stats-from-api",
-    summary="Update Stats from Docker API",
-    description="Fetches the latest Docker Hub repository stats from the Docker API and saves them to a local JSON/CSV file.",
-    tags=["Stats"],
-)
-def update_stats_from_api(file_type: str = Query("json", enum=["json", "csv"], description="The file format to save stats to (json or csv).")):
-    """
-    Update stats by fetching data from Docker API.
+    combined_stats = {
+        "docker": docker_stats,
+        "conda": conda_stats,
+        "bioconductor": bioconductor_stats,
+    }
 
-    - **file_type**: Specify whether to save data in a JSON or CSV file.
-    """
-    stats = fetch_all_docker_stats()
-    if not stats:
-        raise HTTPException(status_code=500, detail="Failed to fetch stats from API.")
-    save_stats_to_file(stats, file_type)
-    return {"message": f"Stats updated and saved to {file_type.upper()} file.", "last_update": datetime.now().isoformat()}
+    save_stats_to_file(combined_stats, file_type)
+    return {
+        "message": f"Stats updated and saved to {file_type.upper()} file.",
+        "last_update": datetime.now().isoformat(),
+        "stats": combined_stats,
+    }
 
 def load_stats_from_file(file_type="json"):
-    """
-    Load stats from the local JSON or CSV file.
-    """
     if file_type == "json":
         try:
             with open(JSON_FILE, "r") as json_file:
@@ -95,50 +80,30 @@ def load_stats_from_file(file_type="json"):
         except FileNotFoundError:
             return {"error": "Stats file not found."}
 
-
 def save_stats_to_file(stats, file_type="json"):
-    """
-    Save stats to a JSON or CSV file with a timestamp.
-    """
-    now = datetime.now().isoformat()
+    now = datetime.now(timezone("UTC"))
+    est_time = now.astimezone(timezone("US/Eastern")).isoformat()
     if file_type == "json":
         with open(JSON_FILE, "w") as json_file:
-            json.dump({"last_update": now, "stats": stats}, json_file, indent=4)
+            json.dump({"last_update": est_time, "stats": stats}, json_file, indent=4)
     elif file_type == "csv":
         with open(CSV_FILE, "w", newline="") as csv_file:
             writer = csv.writer(csv_file)
-            writer.writerow(["Repository", "Pull Count", "Last Update"])
-            for repo, data in stats.items():
-                writer.writerow([repo, data.get("pull_count", "N/A"), now])
-
+            writer.writerow(["Platform", "Repository", "Pull Count", "Last Update"])
+            for platform, platform_stats in stats.items():
+                for repo, data in platform_stats.items():
+                    writer.writerow([platform, repo, data.get("pull_count", "N/A"), est_time])
 
 def fetch_all_docker_stats():
-    """
-    Fetch Docker stats for all repositories in the Biobakery organization and sort by pull count in descending order.
-    """
     repositories = fetch_biobakery_repositories()
     stats = {}
     for repository in repositories:
         print(f"Fetching stats for biobakery/{repository}...")
         pull_count = fetch_docker_stats(repository)
-        if pull_count is not None:
-            stats[f"biobakery/{repository}"] = {"pull_count": pull_count}
-        else:
-            stats[f"biobakery/{repository}"] = {"error": "Failed to fetch data"}
-    
-    # Sort stats by pull count in descending order
-    sorted_stats = dict(
-        sorted(stats.items(), key=lambda item: item[1].get("pull_count", 0), reverse=True)
-    )
-    
-    return sorted_stats
-
-
+        stats[f"biobakery/{repository}"] = {"pull_count": pull_count} if pull_count else {"error": "Failed to fetch data"}
+    return stats
 
 def fetch_biobakery_repositories():
-    """
-    Fetch a list of all repositories for the Biobakery organization.
-    """
     repositories = []
     page = 1
     while True:
@@ -147,11 +112,7 @@ def fetch_biobakery_repositories():
             response = requests.get(url)
             response.raise_for_status()
             data = response.json()
-
-            # Add repositories to the list
             repositories += [repo["name"] for repo in data["results"]]
-
-            # Check if there are more pages
             if not data["next"]:
                 break
             page += 1
@@ -160,20 +121,83 @@ def fetch_biobakery_repositories():
             break
     return repositories
 
-
 def fetch_docker_stats(repository):
-    """
-    Fetch stats for a specific Docker repository.
-    """
     url = f"https://hub.docker.com/v2/repositories/biobakery/{repository}/"
     try:
         response = requests.get(url)
         response.raise_for_status()
         data = response.json()
-
-        # Extract pull count
-        pull_count = data.get("pull_count", 0)
-        return pull_count
+        return data.get("pull_count", 0)
     except requests.exceptions.RequestException as e:
         print(f"Error fetching data for {repository}: {e}")
         return None
+
+def fetch_conda_stats_via_curl():
+    tools = set()
+    c_pattern = r'<a data-package href="/biobakery/(.*?)">'
+    os.system("curl https://anaconda.org/biobakery/repo --silent > TEMP.dat")
+
+    for line in zu.iter_lines("TEMP.dat"):
+        for M in re.finditer(c_pattern, line):
+            tools.add(M.group(1))
+
+    counts = Counter()
+    counts[("biobakery", "*", "*")] = 0  # This is where the tuple key is used
+
+    c_pattern = r'<span>(\d+)</span> total downloads'
+
+    for tool in sorted(tools):
+        print(f"Checking: {tool}")
+        os.system(f"curl https://anaconda.org/biobakery/{tool} --silent > TEMP.dat")
+        for line in zu.iter_lines("TEMP.dat"):
+            for M in re.finditer(c_pattern, line):
+                count = int(M.group(1).replace(",", ""))
+                counts[("biobakery", "*", "*")] += count
+                counts[("biobakery", tool, "*")] += count
+        time.sleep(2)
+
+    # Convert tuple keys to string for JSON compatibility
+    string_counts = {}
+    for key, value in counts.items():
+        string_key = f"{key[0]}_{key[1]}_{key[2]}"  # Convert tuple to a string key
+        string_counts[string_key] = value
+    
+    return {"conda": string_counts}
+
+
+def fetch_bioconductor_stats(packages):
+    # List of Bioconductor tools
+    tools = [
+        "banocc",
+        "sparseDOSSA",
+        "Maaslin2",
+        "Macarron",
+        "MMUPHin"
+    ]
+
+    counts = Counter()
+    counts[("biobakery", "*", "*")] = 0  # Initialize total counter
+
+    # Pattern to match the download count
+    c_pattern = r'<span>(\d+)</span> total downloads'
+
+    # Iterate through each tool and fetch stats
+    for tool in sorted(tools):
+        print(f"Checking: {tool}")
+        os.system(f"curl https://bioconductor.org/packages/stats/bioc/{tool}/{tool}_stats.tab --silent > TEMP.dat")
+
+        # Parse the downloaded data
+        for line in zu.iter_rows("TEMP.dat"):
+            if line[1] == "all":
+                count = int(line[3])
+                counts[("biobakery", "*", "*")] += count
+                counts[("biobakery", tool, "*")] += count
+        time.sleep(2)  # To avoid rate limits
+
+    # Convert tuple keys to string for JSON compatibility
+    string_counts = {}
+    for key, value in counts.items():
+        string_key = f"{key[0]}_{key[1]}_{key[2]}"  # Convert tuple to a string key
+        string_counts[string_key] = value
+
+    return {"bioconductor": string_counts}

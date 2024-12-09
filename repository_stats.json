@@ -1,0 +1,136 @@
+{
+    "last_update": "2024-12-09T00:41:45.635159-05:00",
+    "stats": {
+        "docker": {
+            "biobakery/micropita": {
+                "pull_count": 190
+            },
+            "biobakery/maaslin": {
+                "pull_count": 260
+            },
+            "biobakery/lefse": {
+                "pull_count": 4285
+            },
+            "biobakery/graphlan": {
+                "pull_count": 332
+            },
+            "biobakery/ccrepe": {
+                "pull_count": 152
+            },
+            "biobakery/breadcrumbs": {
+                "pull_count": 150
+            },
+            "biobakery/base": {
+                "pull_count": 289
+            },
+            "biobakery/galaxy_docker": {
+                "pull_count": 143
+            },
+            "biobakery/kneaddata": {
+                "pull_count": 67179
+            },
+            "biobakery/phylophlan": {
+                "pull_count": 245
+            },
+            "biobakery/halla": {
+                "pull_count": 180
+            },
+            "biobakery/humann2": {
+                "pull_count": 10698
+            },
+            "biobakery/metaphlan2": {
+                "pull_count": 14510
+            },
+            "biobakery/panphlan": {
+                "pull_count": 100
+            },
+            "biobakery/ppanini": {
+                "pull_count": 274
+            },
+            "biobakery/shortbred": {
+                "pull_count": 2296
+            },
+            "biobakery/sparsedossa": {
+                "pull_count": 78
+            },
+            "biobakery/strainphlan": {
+                "pull_count": 675
+            },
+            "biobakery/hclust2": {
+                "pull_count": 118
+            },
+            "biobakery/workflows": {
+                "pull_count": 369584
+            },
+            "biobakery/arepa": {
+                "pull_count": 74
+            },
+            "biobakery/maaslin2": {
+                "pull_count": 367
+            },
+            "biobakery/waafle": {
+                "pull_count": 42
+            },
+            "biobakery/isolate_assembly": {
+                "pull_count": 55
+            },
+            "biobakery/humann": {
+                "pull_count": 88994
+            },
+            "biobakery/banocc": {
+                "pull_count": 28
+            },
+            "biobakery/mmuphin": {
+                "pull_count": 56
+            },
+            "biobakery/melonnpan": {
+                "pull_count": 67
+            },
+            "biobakery/metaphlan": {
+                "pull_count": 21528
+            },
+            "biobakery/metawibele": {
+                "pull_count": 307
+            },
+            "biobakery/parathaa": {
+                "pull_count": 8
+            }
+        },
+        "conda": {
+            "conda": {
+                "biobakery_*_*": 32071,
+                "biobakery_anadama2_*": 3083,
+                "biobakery_biobakery_demos_*": 170,
+                "biobakery_biobakery_workflows_*": 3145,
+                "biobakery_breadcrumbs_*": 216,
+                "biobakery_fugassem_*": 20,
+                "biobakery_graphlan_*": 1026,
+                "biobakery_halla_*": 251,
+                "biobakery_hclust2_*": 349,
+                "biobakery_humann_*": 13692,
+                "biobakery_humann2_*": 1575,
+                "biobakery_kneaddata_*": 4560,
+                "biobakery_leveldb_*": 1526,
+                "biobakery_maaslin2_*": 124,
+                "biobakery_metawibele_*": 537,
+                "biobakery_micropita_*": 179,
+                "biobakery_mlpy_*": 111,
+                "biobakery_panphlan_*": 160,
+                "biobakery_parathaa_*": 39,
+                "biobakery_ppanini_*": 257,
+                "biobakery_shortbred_*": 639,
+                "biobakery_waafle_*": 412
+            }
+        },
+        "bioconductor": {
+            "bioconductor": {
+                "biobakery_*_*": 84769,
+                "biobakery_MMUPHin_*": 10669,
+                "biobakery_Maaslin2_*": 48661,
+                "biobakery_Macarron_*": 3979,
+                "biobakery_banocc_*": 12687,
+                "biobakery_sparseDOSSA_*": 8773
+            }
+        }
+    }
+}

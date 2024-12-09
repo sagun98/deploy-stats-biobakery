@@ -1,3 +1,5 @@
 cloudscraper
 fastapi 
 uvicorn
+pytz
+bs4
