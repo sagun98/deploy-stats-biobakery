@@ -1,3 +1,8 @@
+
+from bs4 import BeautifulSoup
+import requests
+from requests.auth import HTTPBasicAuth
+import re
 import os
 import re
 import time
@@ -51,11 +56,12 @@ def update_stats_from_api(file_type: str = Query("json", enum=["json", "csv"])):
     conda_stats = fetch_conda_stats_via_curl()
     bioconductor_packages = ["MMUPHin", "Maaslin2", "Macarron", "banocc", "sparseDOSSA"]
     bioconductor_stats = fetch_bioconductor_stats(bioconductor_packages)
-
+    galaxy_stats = fetch_galaxy_stats()
     combined_stats = {
         "docker": docker_stats,
         "conda": conda_stats,
         "bioconductor": bioconductor_stats,
+        "galaxy": galaxy_stats
     }
 
     save_stats_to_file(combined_stats, file_type)
@@ -201,3 +207,87 @@ def fetch_bioconductor_stats(packages):
         string_counts[string_key] = value
 
     return {"bioconductor": string_counts}
+
+# List of tools to discard from the output
+EXCLUDED_TOOLS = {
+    "-", "vcf_to_maf_customtrack1", "upload1", "ucsc_table_direct_archaea1",
+    "ucsc_table_direct1", "Summary_Statistics1", "sra_source", "sort1",
+    "solid_qual_stats", "solid_qual_boxplot", "solid2fastq", "send_to_cloud",
+    "Paste1", "join1", "intermine", "hgv_lps", "hgv_linkToGProfile",
+    "hgv_ldtools", "hgv_david", "gtf_filter_by_attribute_values_list",
+    "Grep1", "gff_filter_by_feature_count", "Filter1", "Count1",
+    "CONVERTER_interval_to_bedstrict_0", "CONVERTER_fasta_to_tabular",
+    "Convert characters1", "aggregate_scores_in_intervals2", "addValue",
+    "__ZIP_COLLECTION__", "__SET_METADATA__", "__EXPORT_HISTORY__"
+}
+
+def fetch_galaxy_stats():
+    """
+    Fetch Galaxy stats:
+    - Total registered users
+    - Total jobs_ran
+    - Sorted tools (ascending order) with renamed "jobs_ok" → "jobs_ran"
+    """
+    galaxy_stats = {
+        "total_registered_users": 0,
+        "total_jobs_ran": 0,
+        "tools_and_job_states": []
+    }
+
+    # ✅ Fetch total registered users
+    users_url = "http://galaxy.biobakery.org/reports/users/registered_users"
+    try:
+        response = requests.get(users_url, auth=HTTPBasicAuth("admin", "biobakery123"))
+        response.raise_for_status()
+
+        # ✅ Use BeautifulSoup to extract the number of registered users
+        soup = BeautifulSoup(response.text, "html.parser")
+        user_count_tag = soup.find("a", href="/reports/users/registered_users_per_month?sort_id=default&order=default")
+        if user_count_tag:
+            galaxy_stats["total_registered_users"] = int(user_count_tag.text.strip())
+        else:
+            galaxy_stats["total_registered_users"] = "Error: Unable to parse user count"
+
+    except requests.exceptions.RequestException as e:
+        galaxy_stats["total_registered_users"] = f"Error fetching data: {e}"
+
+    # ✅ Fetch tool job states
+    tools_url = "http://galaxy.biobakery.org/reports/tools/tools_and_job_state"
+    try:
+        response = requests.get(tools_url, auth=HTTPBasicAuth("admin", "biobakery123"))
+        response.raise_for_status()
+
+        # ✅ Parse the HTML response
+        soup = BeautifulSoup(response.text, "html.parser")
+        table_rows = soup.select("table.colored tr")
+
+        tools = []
+        total_jobs_ran = 0  # Track total jobs ran
+
+        for row in table_rows[1:]:  # Skip the header row
+            columns = row.find_all("td")
+            if len(columns) < 2:
+                continue  # Skip invalid rows
+
+            tool_name_tag = columns[0].find("a")
+            jobs_ran = columns[1].text.strip()
+
+            tool_name = tool_name_tag.text.strip() if tool_name_tag else "-"
+            jobs_ran_count = int(jobs_ran) if jobs_ran.isdigit() else 0
+
+            # ✅ Exclude tools in the EXCLUDED_TOOLS set
+            if tool_name not in EXCLUDED_TOOLS:
+                tools.append({
+                    "tool": tool_name,
+                    "jobs_ran": jobs_ran_count
+                })
+                total_jobs_ran += jobs_ran_count  # Accumulate total jobs ran
+
+        # ✅ Sort tools alphabetically in ascending order
+        galaxy_stats["tools_and_job_states"] = sorted(tools, key=lambda x: x["tool"])
+        galaxy_stats["total_jobs_ran"] = total_jobs_ran  # Add total jobs_ran
+
+    except requests.exceptions.RequestException as e:
+        galaxy_stats["tools_and_job_states"] = f"Error fetching data: {e}"
+
+    return galaxy_stats

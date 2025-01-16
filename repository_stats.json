@@ -1,136 +1,230 @@
 {
-    "last_update": "2024-12-09T00:41:45.635159-05:00",
+    "last_update": "2025-01-16T17:12:43.980515-05:00",
     "stats": {
         "docker": {
             "biobakery/micropita": {
-                "pull_count": 190
+                "pull_count": 195
             },
             "biobakery/maaslin": {
-                "pull_count": 260
+                "pull_count": 262
             },
             "biobakery/lefse": {
-                "pull_count": 4285
+                "pull_count": 4319
             },
             "biobakery/graphlan": {
-                "pull_count": 332
+                "pull_count": 334
             },
             "biobakery/ccrepe": {
-                "pull_count": 152
+                "pull_count": 171
             },
             "biobakery/breadcrumbs": {
-                "pull_count": 150
+                "pull_count": 155
             },
             "biobakery/base": {
-                "pull_count": 289
+                "pull_count": 310
             },
             "biobakery/galaxy_docker": {
-                "pull_count": 143
+                "pull_count": 149
             },
             "biobakery/kneaddata": {
-                "pull_count": 67179
+                "pull_count": 69253
             },
             "biobakery/phylophlan": {
-                "pull_count": 245
+                "pull_count": 254
             },
             "biobakery/halla": {
-                "pull_count": 180
+                "pull_count": 200
             },
             "biobakery/humann2": {
-                "pull_count": 10698
+                "pull_count": 10712
             },
             "biobakery/metaphlan2": {
-                "pull_count": 14510
+                "pull_count": 14514
             },
             "biobakery/panphlan": {
                 "pull_count": 100
             },
             "biobakery/ppanini": {
-                "pull_count": 274
+                "pull_count": 283
             },
             "biobakery/shortbred": {
-                "pull_count": 2296
+                "pull_count": 2306
             },
             "biobakery/sparsedossa": {
-                "pull_count": 78
+                "pull_count": 89
             },
             "biobakery/strainphlan": {
-                "pull_count": 675
+                "pull_count": 700
             },
             "biobakery/hclust2": {
-                "pull_count": 118
+                "pull_count": 129
             },
             "biobakery/workflows": {
-                "pull_count": 369584
+                "pull_count": 369718
             },
             "biobakery/arepa": {
-                "pull_count": 74
+                "pull_count": 85
             },
             "biobakery/maaslin2": {
-                "pull_count": 367
+                "pull_count": 378
             },
             "biobakery/waafle": {
-                "pull_count": 42
+                "pull_count": 51
             },
             "biobakery/isolate_assembly": {
-                "pull_count": 55
+                "pull_count": 84
             },
             "biobakery/humann": {
-                "pull_count": 88994
+                "pull_count": 89801
             },
             "biobakery/banocc": {
                 "pull_count": 28
             },
             "biobakery/mmuphin": {
-                "pull_count": 56
+                "pull_count": 59
             },
             "biobakery/melonnpan": {
-                "pull_count": 67
+                "pull_count": 80
             },
             "biobakery/metaphlan": {
-                "pull_count": 21528
+                "pull_count": 21901
             },
             "biobakery/metawibele": {
-                "pull_count": 307
+                "pull_count": 448
             },
             "biobakery/parathaa": {
-                "pull_count": 8
+                "pull_count": 13
             }
         },
         "conda": {
             "conda": {
-                "biobakery_*_*": 32071,
-                "biobakery_anadama2_*": 3083,
-                "biobakery_biobakery_demos_*": 170,
-                "biobakery_biobakery_workflows_*": 3145,
-                "biobakery_breadcrumbs_*": 216,
-                "biobakery_fugassem_*": 20,
-                "biobakery_graphlan_*": 1026,
-                "biobakery_halla_*": 251,
-                "biobakery_hclust2_*": 349,
-                "biobakery_humann_*": 13692,
-                "biobakery_humann2_*": 1575,
-                "biobakery_kneaddata_*": 4560,
-                "biobakery_leveldb_*": 1526,
-                "biobakery_maaslin2_*": 124,
-                "biobakery_metawibele_*": 537,
-                "biobakery_micropita_*": 179,
-                "biobakery_mlpy_*": 111,
-                "biobakery_panphlan_*": 160,
-                "biobakery_parathaa_*": 39,
-                "biobakery_ppanini_*": 257,
-                "biobakery_shortbred_*": 639,
-                "biobakery_waafle_*": 412
+                "biobakery_*_*": 32798,
+                "biobakery_anadama2_*": 3131,
+                "biobakery_biobakery_demos_*": 172,
+                "biobakery_biobakery_workflows_*": 3197,
+                "biobakery_breadcrumbs_*": 220,
+                "biobakery_fugassem_*": 23,
+                "biobakery_graphlan_*": 1040,
+                "biobakery_halla_*": 256,
+                "biobakery_hclust2_*": 355,
+                "biobakery_humann_*": 14040,
+                "biobakery_humann2_*": 1587,
+                "biobakery_kneaddata_*": 4681,
+                "biobakery_leveldb_*": 1539,
+                "biobakery_maaslin2_*": 128,
+                "biobakery_metawibele_*": 574,
+                "biobakery_micropita_*": 183,
+                "biobakery_mlpy_*": 114,
+                "biobakery_panphlan_*": 162,
+                "biobakery_parathaa_*": 42,
+                "biobakery_ppanini_*": 266,
+                "biobakery_shortbred_*": 646,
+                "biobakery_waafle_*": 442
             }
         },
         "bioconductor": {
             "bioconductor": {
-                "biobakery_*_*": 84769,
-                "biobakery_MMUPHin_*": 10669,
-                "biobakery_Maaslin2_*": 48661,
-                "biobakery_Macarron_*": 3979,
-                "biobakery_banocc_*": 12687,
-                "biobakery_sparseDOSSA_*": 8773
+                "biobakery_*_*": 87089,
+                "biobakery_MMUPHin_*": 11089,
+                "biobakery_Maaslin2_*": 49909,
+                "biobakery_Macarron_*": 4146,
+                "biobakery_banocc_*": 13063,
+                "biobakery_sparseDOSSA_*": 8882
             }
+        },
+        "galaxy": {
+            "total_registered_users": 828,
+            "total_jobs_ran": 44512,
+            "tools_and_job_states": [
+                {
+                    "tool": "HUMAnN",
+                    "jobs_ran": 32
+                },
+                {
+                    "tool": "LEfSe_cla",
+                    "jobs_ran": 3752
+                },
+                {
+                    "tool": "LEfSe_fea",
+                    "jobs_ran": 789
+                },
+                {
+                    "tool": "LEfSe_for",
+                    "jobs_ran": 20862
+                },
+                {
+                    "tool": "LEfSe_res",
+                    "jobs_ran": 6825
+                },
+                {
+                    "tool": "LEfSe_run",
+                    "jobs_ran": 8431
+                },
+                {
+                    "tool": "LEfSe_sfe",
+                    "jobs_ran": 125
+                },
+                {
+                    "tool": "MaAsLin2",
+                    "jobs_ran": 73
+                },
+                {
+                    "tool": "MetaPhlAn",
+                    "jobs_ran": 695
+                },
+                {
+                    "tool": "SparseDOSSA",
+                    "jobs_ran": 30
+                },
+                {
+                    "tool": "halla",
+                    "jobs_ran": 195
+                },
+                {
+                    "tool": "humann_regroup_table",
+                    "jobs_ran": 11
+                },
+                {
+                    "tool": "humann_rename_table",
+                    "jobs_ran": 19
+                },
+                {
+                    "tool": "humann_renorm_table",
+                    "jobs_ran": 9
+                },
+                {
+                    "tool": "maaslin",
+                    "jobs_ran": 2595
+                },
+                {
+                    "tool": "mmuphin_adj_batch",
+                    "jobs_ran": 3
+                },
+                {
+                    "tool": "mmuphin_lm_meta",
+                    "jobs_ran": 2
+                },
+                {
+                    "tool": "mmuphin_preprocess_metadata",
+                    "jobs_ran": 51
+                },
+                {
+                    "tool": "picrust2",
+                    "jobs_ran": 0
+                },
+                {
+                    "tool": "waafle_genecaller",
+                    "jobs_ran": 3
+                },
+                {
+                    "tool": "waafle_orgscorer",
+                    "jobs_ran": 3
+                },
+                {
+                    "tool": "waafle_search",
+                    "jobs_ran": 7
+                }
+            ]
         }
     }
 }
